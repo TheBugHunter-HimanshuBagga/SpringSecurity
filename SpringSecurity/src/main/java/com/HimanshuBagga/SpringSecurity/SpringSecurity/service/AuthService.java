@@ -3,6 +3,7 @@
     import com.HimanshuBagga.SpringSecurity.SpringSecurity.Repository.UserRepository;
     import com.HimanshuBagga.SpringSecurity.SpringSecurity.dto.LoginDTO;
     import com.HimanshuBagga.SpringSecurity.SpringSecurity.dto.LoginResponseDTO;
+    import com.HimanshuBagga.SpringSecurity.SpringSecurity.entities.Session;
     import com.HimanshuBagga.SpringSecurity.SpringSecurity.entities.User;
     import lombok.RequiredArgsConstructor;
     import org.modelmapper.ModelMapper;
@@ -18,6 +19,7 @@
         private final AuthenticationManager authenticationManager;
         private final JwtSecurity jwtSecurity;
         private final UserRepository userRepository;
+        private final SessionService sessionService;
         // string as we will get jwt token in a String form
         public LoginResponseDTO login(LoginDTO loginDTO) {// this just takes email + password from the user verifies them if verifies gives then a JWT
             Authentication authentication  = authenticationManager.authenticate(
@@ -27,11 +29,14 @@
             String accessToken =  jwtSecurity.generateAccessToken(user);
             String RefreshToken = jwtSecurity.generateRefreshToken(user);
 
+            sessionService.generateNewSession(user,RefreshToken);
+
             return new LoginResponseDTO(user.getId() , accessToken , RefreshToken);
         }
 
         public LoginResponseDTO refreshToken(String refreshToken) {
             Long userId = jwtSecurity.getUserIdFromToken(refreshToken); // validate
+            sessionService.validateSession(refreshToken);
             User user = userRepository.getUserById(userId); // load user from db
 
             String accessToken = jwtSecurity.generateAccessToken(user); // new access token generated
