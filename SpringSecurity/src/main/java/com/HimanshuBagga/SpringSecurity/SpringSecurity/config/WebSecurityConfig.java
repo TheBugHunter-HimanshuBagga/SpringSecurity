@@ -1,6 +1,7 @@
 package com.HimanshuBagga.SpringSecurity.SpringSecurity.config;
 
 import com.HimanshuBagga.SpringSecurity.SpringSecurity.filters.JwtAuthFilter;
+import com.HimanshuBagga.SpringSecurity.SpringSecurity.handlers.OAuth2SuccessHandler;
 import io.jsonwebtoken.Jwt;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -17,8 +18,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -26,18 +29,24 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class WebSecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
 
         httpSecurity
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/posts" , "/auth/**").permitAll()
+                        .requestMatchers("/posts" , "/auth/**" , "/home.html" , "/error").permitAll()
                         //.requestMatchers("/posts/**").hasAnyRole("ADMIN")
                         .anyRequest().authenticated())
                 .csrf(csrfConfig -> csrfConfig.disable()) // to diable csrf
                 .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 //                .formLogin(Customizer.withDefaults());
-                .addFilterBefore(jwtAuthFilter , UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter , UsernamePasswordAuthenticationFilter.class)
+                .oauth2Login(oauth2Config -> oauth2Config
+                        .failureUrl("/login?error=true")
+                        .successHandler(oAuth2SuccessHandler)
+                );
+
         return httpSecurity.build();
     }
 

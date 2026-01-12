@@ -2,21 +2,16 @@ package com.HimanshuBagga.SpringSecurity.SpringSecurity.service;
 
 import com.HimanshuBagga.SpringSecurity.SpringSecurity.Exception.ResourceNotFoundException;
 import com.HimanshuBagga.SpringSecurity.SpringSecurity.Repository.UserRepository;
-import com.HimanshuBagga.SpringSecurity.SpringSecurity.dto.LoginDTO;
 import com.HimanshuBagga.SpringSecurity.SpringSecurity.dto.SignUpDTO;
 import com.HimanshuBagga.SpringSecurity.SpringSecurity.dto.UserDTO;
 import com.HimanshuBagga.SpringSecurity.SpringSecurity.entities.User;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -47,4 +42,11 @@ public class UserService implements UserDetailsService {
         return userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User with ID : " + userId + " not found"));
     }
 
+    public User getUserByEmail(String email){
+        return userRepository.findByEmail(email).orElse(null);
+    }
+
+    public User save(User newUser) {
+        return userRepository.save(newUser);
+    }
 }
