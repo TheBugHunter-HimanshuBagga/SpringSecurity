@@ -26,7 +26,7 @@ public class JwtSecurity {
         return Jwts.builder()
                 .subject(String.valueOf(user.getId())) // who is the token for // 12->"12"
                 .claim("email", user.getUsername()) // extra info about user
-                .claim("roles", Set.of("ADMIN", "USER"))
+                .claim("roles", user.getRole().toString())
                 .issuedAt(new Date()) // Marks when token was created
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 10)) // jwt is valid until
                 .signWith(getSecretKey()) // takes my secret key and uses hmacShaKey and produce the signature

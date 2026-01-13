@@ -44,7 +44,7 @@ public class JwtAuthFilter extends OncePerRequestFilter { // customised filter r
         Long userId = jwtSecurity.getUserIdFromToken(token); // validate jwt token
         if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             User user = userService.getUserById(userId);// Load user from DB
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user, null, null);
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             authenticationToken.setDetails(
                     new WebAuthenticationDetailsSource().buildDetails(request) // remote Ip address and sessi`on ID`
             );

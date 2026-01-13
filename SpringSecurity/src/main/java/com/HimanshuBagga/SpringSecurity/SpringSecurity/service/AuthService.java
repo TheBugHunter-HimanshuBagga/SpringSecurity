@@ -29,14 +29,14 @@
             String accessToken =  jwtSecurity.generateAccessToken(user);
             String RefreshToken = jwtSecurity.generateRefreshToken(user);
 
-            sessionService.generateNewSession(user,RefreshToken);
+            sessionService.generateNewSession(user,RefreshToken); // session service comes in play
 
             return new LoginResponseDTO(user.getId() , accessToken , RefreshToken);
         }
 
         public LoginResponseDTO refreshToken(String refreshToken) {
-            Long userId = jwtSecurity.getUserIdFromToken(refreshToken); // validate
-            sessionService.validateSession(refreshToken);
+            Long userId = jwtSecurity.getUserIdFromToken(refreshToken); // read userId from refresh token
+            sessionService.validateSession(refreshToken); // check if refresh token exists in db
             User user = userRepository.getUserById(userId); // load user from db
 
             String accessToken = jwtSecurity.generateAccessToken(user); // new access token generated

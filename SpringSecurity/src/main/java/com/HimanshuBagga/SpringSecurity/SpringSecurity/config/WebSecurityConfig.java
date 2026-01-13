@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwt;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.Customizer;
@@ -24,18 +25,25 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static com.HimanshuBagga.SpringSecurity.SpringSecurity.entities.enums.Role.ADMIN;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private static final String[] publicRouts = {
+            "/auth/**" , "/home.html" , "/error"
+    };
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
 
         httpSecurity
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/posts" , "/auth/**" , "/home.html" , "/error").permitAll()
+                        .requestMatchers(publicRouts).permitAll()
+                        .requestMatchers(HttpMethod.GET , "/posts/**").permitAll()
+                        .requestMatchers(HttpMethod.POST , "/posts/**").hasAnyRole("ADMIN","CREATOR")
                         //.requestMatchers("/posts/**").hasAnyRole("ADMIN")
                         .anyRequest().authenticated())
                 .csrf(csrfConfig -> csrfConfig.disable()) // to diable csrf
