@@ -1,5 +1,6 @@
 package com.HimanshuBagga.SpringSecurity.SpringSecurity.dto;
 
+import com.HimanshuBagga.SpringSecurity.SpringSecurity.entities.enums.Permissions;
 import com.HimanshuBagga.SpringSecurity.SpringSecurity.entities.enums.Role;
 import lombok.Data;
 
@@ -11,4 +12,5 @@ public class SignUpDTO {
     private String password;
     private String name;
     private Set<Role> role;
+    private Set<Permissions> permissions;
 }

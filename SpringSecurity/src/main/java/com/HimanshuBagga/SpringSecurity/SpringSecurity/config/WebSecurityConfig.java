@@ -11,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -25,11 +26,14 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static com.HimanshuBagga.SpringSecurity.SpringSecurity.entities.enums.Permissions.*;
 import static com.HimanshuBagga.SpringSecurity.SpringSecurity.entities.enums.Role.ADMIN;
+import static com.HimanshuBagga.SpringSecurity.SpringSecurity.entities.enums.Role.CREATOR;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableMethodSecurity(securedEnabled = true)
 public class WebSecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
@@ -43,17 +47,20 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(publicRouts).permitAll()
                         .requestMatchers(HttpMethod.GET , "/posts/**").permitAll()
-                        .requestMatchers(HttpMethod.POST , "/posts/**").hasAnyRole("ADMIN","CREATOR")
+                        .requestMatchers(HttpMethod.POST , "/posts/**").hasAnyRole(ADMIN.name(), CREATOR.name())
+                        .requestMatchers(HttpMethod.POST , "/posts/**").hasAnyRole(POST_CREATE.name())
+                        .requestMatchers(HttpMethod.PUT , "/posts/**").hasAnyRole(POST_UPDATE.name())
+                        .requestMatchers(HttpMethod.DELETE , "/posts/**").hasAnyRole(POST_DELETE.name())
                         //.requestMatchers("/posts/**").hasAnyRole("ADMIN")
                         .anyRequest().authenticated())
                 .csrf(csrfConfig -> csrfConfig.disable()) // to diable csrf
                 .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 //                .formLogin(Customizer.withDefaults());
-                .addFilterBefore(jwtAuthFilter , UsernamePasswordAuthenticationFilter.class)
-                .oauth2Login(oauth2Config -> oauth2Config
-                        .failureUrl("/login?error=true")
-                        .successHandler(oAuth2SuccessHandler)
-                );
+                .addFilterBefore(jwtAuthFilter , UsernamePasswordAuthenticationFilter.class);
+//                .oauth2Login(oauth2Config -> oauth2Config
+//                        .failureUrl("/login?error=true")
+//                        .successHandler(oAuth2SuccessHandler)
+//                );
 
         return httpSecurity.build();
     }
