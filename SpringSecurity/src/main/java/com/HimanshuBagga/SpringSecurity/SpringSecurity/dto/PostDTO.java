@@ -1,5 +1,7 @@
 package com.HimanshuBagga.SpringSecurity.SpringSecurity.dto;
 
+import com.HimanshuBagga.SpringSecurity.SpringSecurity.entities.User;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,8 +21,7 @@ public class PostDTO {
     @NotBlank(message = "Description can't be left empty.")
     @Size(max = 100 , min = 10)
     private String description;
-    private LocalDateTime createdAtt;
-    private LocalDateTime updatedDate;
-    private String createdAt;
-    private String updatedBy;
+
+    @ManyToOne
+    private UserDTO author;
 }

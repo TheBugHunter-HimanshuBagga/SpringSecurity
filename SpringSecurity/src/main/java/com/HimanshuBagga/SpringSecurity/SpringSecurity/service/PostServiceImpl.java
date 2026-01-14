@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,9 @@ public class PostServiceImpl implements PostService{
 
     @Override
     public PostDTO createNewPost(PostDTO inputPost) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal(); // get the current user
         PostEntity postEntity = modelMapper.map(inputPost , PostEntity.class);
+        postEntity.setAuthor(user);
         var createdNewPost = postRepository.save(postEntity);
         return modelMapper.map(createdNewPost , PostDTO.class);
     }

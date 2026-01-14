@@ -19,16 +19,6 @@ public class PostEntity {
     private String title;
     //    @NotAudited -> now hibernate envers won't take care of the fields declare in this
     private String description;
-    @PrePersist
-    void beforeSave(){
-
-    }
-    @PreUpdate
-    void beforeUpdate(){
-
-    }
-    @PreRemove
-    void beforeDelete(){
-
-    }
+    @ManyToOne
+    private User author;
 }
